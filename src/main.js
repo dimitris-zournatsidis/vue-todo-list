@@ -1,5 +1,8 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import 'bootstrap';
+import Toast from 'vue-toastification';
 
-createApp(App).mount('#app');
+const app = createApp(App);
+app.use(Toast);
+app.mount('#app');

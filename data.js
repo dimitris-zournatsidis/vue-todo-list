@@ -13,7 +13,7 @@ let todo = [
   },
 ];
 
-module.exports = function () {
+module.exports = () => {
   return {
     todo: todo,
   };

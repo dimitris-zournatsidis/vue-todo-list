@@ -4,7 +4,7 @@
       <table class="table table-bordered mt-5">
         <thead>
           <tr>
-            <th>TODO</th>
+            <th>TODOS</th>
             <th class="text-center">Actions</th>
           </tr>
         </thead>
@@ -23,7 +23,7 @@
               </button>
               <button
                 class="btn btn-danger btn-sm mx-1"
-                @click="handleDelete(item.id)"
+                @click="handleDelete(item)"
               >
                 Delete
               </button>
@@ -45,12 +45,15 @@
           </td>
 
           <td class="align-middle text-center w-25">
-            <button class="btn btn-primary btn-sm mx-1" @click="handleTodoItem">
+            <button
+              class="btn bg-dark text-white btn-lg mx-1"
+              @click="handleAddTodo"
+            >
               {{ editMode ? "Edit" : "Add" }}
             </button>
             <button
               v-if="editMode"
-              class="btn btn-danger btn-sm mx-1"
+              class="btn bg-danger text-white btn-lg mx-1"
               @click="handleCancel"
             >
               Cancel
@@ -64,7 +67,10 @@
 
 <script>
 import axios from "axios";
+import { useToast } from "vue-toastification";
+import "vue-toastification/dist/index.css";
 const todoUrl = "http://localhost:3500/todo";
+const toast = useToast();
 
 export default {
   data() {
@@ -75,6 +81,27 @@ export default {
     };
   },
   methods: {
+    async handleAddTodo() {
+      if (!this.todoItem.content) {
+        toast.error("Field must not be empty!");
+      } else {
+        const id = this.todoItem.id;
+        if (this.editMode) {
+          await axios.put(`${todoUrl}/${id}`, this.todoItem);
+          this.editMode = false;
+          this.todoItem.content = "";
+        } else {
+          await axios.post(todoUrl, this.todoItem);
+          this.todoItem.content = "";
+        }
+
+        axios.get(todoUrl).then((response) => {
+          this.todoList = response.data;
+        });
+      }
+
+      // console.log("todos", this?.todoList);
+    },
     handleEdit(id) {
       this.editMode = true;
       this.todoItem = this.todoList.find((item) => item.id === id);
@@ -83,26 +110,13 @@ export default {
       this.editMode = false;
       this.todoItem = "";
     },
-    async handleTodoItem() {
-      const id = this.todoItem.id;
-      if (this.editMode) {
-        await axios.put(`${todoUrl}/${id}`, this.todoItem);
-        this.editMode = false;
-        this.todoItem.content = "";
-      } else {
-        await axios.post(todoUrl, this.todoItem);
-        this.todoItem.content = "";
+    async handleDelete(todo) {
+      if (window.confirm(`Do you really want to delete "${todo.content}"?`)) {
+        await axios.delete(`${todoUrl}/${todo.id}`);
+        axios.get(todoUrl).then((response) => {
+          this.todoList = response.data;
+        });
       }
-
-      axios.get(todoUrl).then((response) => {
-        this.todoList = response.data;
-      });
-    },
-    async handleDelete(id) {
-      await axios.delete(`${todoUrl}/${id}`);
-      axios.get(todoUrl).then((response) => {
-        this.todoList = response.data;
-      });
     },
   },
   created() {
