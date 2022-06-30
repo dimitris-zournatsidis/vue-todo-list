@@ -1,30 +1,24 @@
 <template>
-  <div class="container">
-    <div class="col-12">
-      <table class="table table-bordered mt-5">
+  <div class='container'>
+    <div class='col-12'>
+      <table class='table table-bordered mt-5'>
         <thead>
           <tr>
             <th>TODOS</th>
-            <th class="text-center">Actions</th>
+            <th class='text-center'>Actions</th>
           </tr>
         </thead>
 
         <tbody>
           <tr v-for="item in todoList" :key="item.id">
-            <td class="align-middle w-75">
+            <td class='align-middle w-75'>
               {{ item.content }}
             </td>
-            <td class="align-middle text-center w-75">
-              <button
-                class="btn btn-info btn-sm mx-1"
-                @click="handleEdit(item.id)"
-              >
+            <td class='align-middle text-center w-75'>
+              <button class='btn btn-info btn-sm mx-1' @click='handleEdit(item.id)'>
                 Edit
               </button>
-              <button
-                class="btn btn-danger btn-sm mx-1"
-                @click="handleDelete(item)"
-              >
+              <button class='btn btn-danger btn-sm mx-1' @click='handleDelete(item)'>
                 Delete
               </button>
             </td>
@@ -32,30 +26,18 @@
         </tbody>
 
         <tfoot>
-          <td class="align-middle text-center w-75">
-            <div class="form-group">
-              <label for="">{{ editMode ? "Edit" : "Add" }}</label>
-              <input
-                type="text"
-                class="form-control"
-                v-model="todoItem.content"
-                placeholder="Add a todo..."
-              />
+          <td class='align-middle text-center w-75'>
+            <div class='form-group'>
+              <label for=''>{{ editMode ? 'Edit' : 'Add' }}</label>
+              <input type='text' class='form-control' v-model='todoItem.content' placeholder='Add a todo...' />
             </div>
           </td>
 
-          <td class="align-middle text-center w-25">
-            <button
-              class="btn bg-dark text-white btn-lg mx-1"
-              @click="handleAddTodo"
-            >
-              {{ editMode ? "Edit" : "Add" }}
+          <td class='align-middle text-center w-25'>
+            <button class='btn bg-dark text-white btn-lg mx-1' @click='handleAddTodo'>
+              {{ editMode ? 'Edit' : 'Add' }}
             </button>
-            <button
-              v-if="editMode"
-              class="btn bg-danger text-white btn-lg mx-1"
-              @click="handleCancel"
-            >
+            <button v-if='editMode' class='btn bg-danger text-white btn-lg mx-1' @click='handleCancel'>
               Cancel
             </button>
           </td>
@@ -66,10 +48,10 @@
 </template>
 
 <script>
-import axios from "axios";
-import { useToast } from "vue-toastification";
-import "vue-toastification/dist/index.css";
-const todoUrl = "http://localhost:3500/todo";
+import axios from 'axios';
+import { useToast } from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
+const todoUrl = 'http://localhost:3500/todo';
 const toast = useToast();
 
 export default {
@@ -83,16 +65,16 @@ export default {
   methods: {
     async handleAddTodo() {
       if (!this.todoItem.content) {
-        toast.error("Field must not be empty!");
+        toast.error('Field must not be empty!');
       } else {
         const id = this.todoItem.id;
         if (this.editMode) {
           await axios.put(`${todoUrl}/${id}`, this.todoItem);
           this.editMode = false;
-          this.todoItem.content = "";
+          this.todoItem.content = '';
         } else {
           await axios.post(todoUrl, this.todoItem);
-          this.todoItem.content = "";
+          this.todoItem.content = '';
         }
 
         axios.get(todoUrl).then((response) => {
@@ -108,10 +90,10 @@ export default {
     },
     handleCancel() {
       this.editMode = false;
-      this.todoItem = "";
+      this.todoItem = '';
     },
     async handleDelete(todo) {
-      if (window.confirm(`Do you really want to delete "${todo.content}"?`)) {
+      if (window.confirm(`Do you really want to delete '${todo.content}'?`)) {
         await axios.delete(`${todoUrl}/${todo.id}`);
         axios.get(todoUrl).then((response) => {
           this.todoList = response.data;
@@ -121,13 +103,14 @@ export default {
   },
   created() {
     axios.get(todoUrl).then((response) => {
-      //   console.log('res!!!', response);
+      // console.log('res!!!', response);
       this.todoList = response.data;
+      // console.log('my data', this.todoList);
     });
   },
 };
 </script>
 
 <style>
-@import "~bootstrap/dist/css/bootstrap.css";
+@import '~bootstrap/dist/css/bootstrap.css';
 </style>
